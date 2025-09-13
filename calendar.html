@@ -1,0 +1,1086 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LunarCal</title>
+    <script src="https://cdn.jsdelivr.net/npm/lunar-javascript@1.6.12/lunar.min.js"></script>
+    <style>
+        :root {
+            /* Light theme variables */
+            --bg-gradient-start: #1e3a8a;
+            --bg-gradient-end: #1e40af;
+            --container-bg: rgba(255, 255, 255, 0.15);
+            --container-border: rgba(255, 255, 255, 0.2);
+            --container-highlight: rgba(255, 255, 255, 0.3);
+            --text-primary: rgba(255, 255, 255, 0.95);
+            --text-secondary: rgba(255, 255, 255, 0.65);
+            --text-muted: rgba(255, 255, 255, 0.4);
+            --controls-bg: rgba(255, 255, 255, 0.08);
+            --controls-border: rgba(255, 255, 255, 0.15);
+            --cell-bg: rgba(255, 255, 255, 0.08);
+            --cell-border: rgba(255, 255, 255, 0.1);
+            --cell-hover-bg: rgba(255, 255, 255, 0.15);
+            --button-bg: rgba(255, 255, 255, 0.12);
+            --button-border: rgba(255, 255, 255, 0.2);
+            --button-hover-bg: rgba(255, 255, 255, 0.18);
+            --today-bg: rgba(0, 122, 255, 0.25);
+            --today-border: rgba(0, 122, 255, 0.4);
+            --today-shadow: rgba(0, 122, 255, 0.3);
+            --sunday-color: rgba(255, 89, 94, 0.95);
+            --sunday-secondary: rgba(255, 89, 94, 0.7);
+        }
+
+        [data-theme="light"] {
+            --bg-gradient-start: #dbeafe;
+            --bg-gradient-end: #bfdbfe;
+            --container-bg: rgba(255, 255, 255, 0.4);
+            --container-border: rgba(255, 255, 255, 0.6);
+            --container-highlight: rgba(255, 255, 255, 0.8);
+            --text-primary: rgba(0, 0, 0, 0.9);
+            --text-secondary: rgba(0, 0, 0, 0.65);
+            --text-muted: rgba(0, 0, 0, 0.4);
+            --controls-bg: rgba(255, 255, 255, 0.3);
+            --controls-border: rgba(255, 255, 255, 0.5);
+            --cell-bg: rgba(255, 255, 255, 0.25);
+            --cell-border: rgba(255, 255, 255, 0.4);
+            --cell-hover-bg: rgba(255, 255, 255, 0.4);
+            --button-bg: rgba(255, 255, 255, 0.3);
+            --button-border: rgba(255, 255, 255, 0.5);
+            --button-hover-bg: rgba(255, 255, 255, 0.45);
+            --today-bg: rgba(0, 122, 255, 0.2);
+            --today-border: rgba(0, 122, 255, 0.4);
+            --today-shadow: rgba(0, 122, 255, 0.2);
+            --sunday-color: rgba(255, 59, 48, 0.9);
+            --sunday-secondary: rgba(255, 59, 48, 0.6);
+        }
+
+        /* Explicit theme overrides to prevent styling issues on theme switch */
+        body[data-theme="dark"] .calendar td,
+        body:not([data-theme="light"]) .calendar td {
+            background: var(--cell-bg) !important;
+            border-color: var(--cell-border) !important;
+        }
+
+        body[data-theme="dark"] .calendar th,
+        body:not([data-theme="light"]) .calendar th {
+            background: var(--cell-bg) !important;
+            border-color: var(--cell-border) !important;
+        }
+
+        body[data-theme="light"] .calendar td {
+            background: var(--cell-bg) !important;
+            border-color: var(--cell-border) !important;
+        }
+
+        body[data-theme="light"] .calendar th {
+            background: var(--cell-bg) !important;
+            border-color: var(--cell-border) !important;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+            min-height: 100vh;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .container {
+            background: var(--container-bg);
+            backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid var(--container-border);
+            border-radius: 24px;
+            padding: 32px;
+            box-shadow:
+                0 20px 40px rgba(0, 0, 0, 0.1),
+                0 8px 16px rgba(0, 0, 0, 0.08),
+                inset 0 1px 0 var(--container-highlight);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            width: 100%;
+            max-width: none;
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+        }
+
+        .controls {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 32px;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 18px;
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 500;
+            font-size: 14px;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+        }
+
+        select {
+            padding: 10px 16px;
+            border: 1px solid var(--button-border);
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 500;
+            background: var(--button-bg);
+            backdrop-filter: blur(10px);
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        select option {
+            background: var(--container-bg);
+            color: var(--text-primary);
+            padding: 8px;
+        }
+
+        select:hover {
+            background: var(--button-hover-bg);
+            border-color: var(--container-border);
+            transform: translateY(-1px);
+        }
+
+        select:focus {
+            outline: none;
+            background: var(--button-hover-bg);
+            border-color: var(--container-border);
+            box-shadow: 0 0 0 3px var(--controls-bg);
+        }
+
+        button {
+            padding: 12px 20px;
+            border: 1px solid var(--button-border);
+            border-radius: 14px;
+            font-size: 16px;
+            font-weight: 600;
+            background: var(--button-bg);
+            backdrop-filter: blur(10px);
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, var(--container-highlight), transparent);
+            transition: left 0.6s ease;
+        }
+
+        button:hover {
+            background: var(--button-hover-bg);
+            border-color: var(--container-border);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        button:hover::before {
+            left: 100%;
+        }
+
+        button:active {
+            transform: translateY(0);
+            background: var(--button-hover-bg);
+        }
+
+        #prevMonthButton, #nextMonthButton, #prevYearButton, #nextYearButton {
+            padding: 10px 14px;
+            min-width: 44px;
+            font-size: 18px;
+            border-radius: 12px;
+        }
+
+        #prevMonthButton, #nextMonthButton, #prevYearButton, #nextYearButton {
+            color: var(--text-primary);
+        }
+
+        #todayButton {
+            background: rgba(0, 122, 255, 0.2);
+            border-color: rgba(0, 122, 255, 0.3);
+            color: var(--text-primary);
+        }
+
+        #todayButton:hover {
+            background: rgba(0, 122, 255, 0.3);
+            border-color: rgba(0, 122, 255, 0.4);
+        }
+
+        #themeToggle, #settingsButton {
+            min-width: 50px;
+            font-size: 20px;
+            padding: 10px;
+            color: var(--text-primary);
+        }
+
+        /* Settings Panel Styles */
+        .settings-panel {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .settings-panel.show {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .settings-content {
+            background: var(--container-bg);
+            backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid var(--container-border);
+            border-radius: 20px;
+            padding: 0;
+            box-shadow:
+                0 20px 40px rgba(0, 0, 0, 0.2),
+                0 8px 16px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            width: 90%;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .settings-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 24px 24px 16px;
+            border-bottom: 1px solid var(--cell-border);
+        }
+
+        .settings-header h3 {
+            margin: 0;
+            color: var(--text-primary);
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        #closeSettings {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--text-secondary);
+            padding: 4px 8px;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+
+        #closeSettings:hover {
+            background: var(--cell-hover-bg);
+            color: var(--text-primary);
+            transform: none;
+            box-shadow: none;
+        }
+
+        .settings-body {
+            padding: 24px;
+        }
+
+        .setting-group {
+            margin-bottom: 24px;
+        }
+
+        .setting-group:last-of-type {
+            margin-bottom: 0;
+        }
+
+        .setting-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+            font-weight: 500;
+            text-transform: none;
+            font-size: 16px;
+            letter-spacing: normal;
+        }
+
+        .color-picker-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        input[type="color"] {
+            width: 60px;
+            height: 40px;
+            border: 1px solid var(--cell-border);
+            border-radius: 8px;
+            background: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        input[type="color"]:hover {
+            border-color: var(--container-border);
+            transform: scale(1.05);
+        }
+
+        .color-label {
+            color: var(--text-secondary);
+            font-family: 'SF Mono', Monaco, monospace;
+            font-size: 14px;
+            background: var(--cell-bg);
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid var(--cell-border);
+            min-width: 80px;
+            text-align: center;
+        }
+
+        .settings-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 32px;
+        }
+
+        .settings-actions button {
+            flex: 1;
+            padding: 12px 16px;
+            font-size: 14px;
+        }
+
+        #resetColors {
+            background: var(--cell-bg);
+            border-color: var(--cell-border);
+            color: var(--text-secondary);
+        }
+
+        #resetColors:hover {
+            background: var(--cell-hover-bg);
+            color: var(--text-primary);
+        }
+
+        #saveSettings {
+            background: rgba(0, 122, 255, 0.2);
+            border-color: rgba(0, 122, 255, 0.3);
+            color: var(--text-primary);
+        }
+
+        #saveSettings:hover {
+            background: rgba(0, 122, 255, 0.3);
+            border-color: rgba(0, 122, 255, 0.4);
+        }
+
+        .calendar {
+            border-collapse: separate;
+            border-spacing: 4px;
+            width: 100%;
+            margin-top: 24px;
+            background: var(--controls-bg);
+            border-radius: 20px;
+            padding: 8px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .calendar th,
+        .calendar td {
+            text-align: center;
+            padding: 12px 6px;
+            width: 14.28%;
+            border-radius: 12px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .calendar th {
+            background: var(--cell-bg);
+            backdrop-filter: blur(10px);
+            color: var(--text-primary);
+            font-weight: 600;
+            font-size: 20px;
+            letter-spacing: 0.5px;
+            border: 1px solid var(--cell-border);
+            text-transform: uppercase;
+            padding: 16px 6px;
+        }
+
+        .calendar td {
+            height: 120px;
+            vertical-align: top;
+            padding: 12px;
+            background: var(--cell-bg);
+            backdrop-filter: blur(8px);
+            border: 1px solid var(--cell-border);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .calendar td::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--container-highlight), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .calendar td:hover {
+            background: var(--cell-hover-bg);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            border-color: var(--container-border);
+        }
+
+        .calendar td:hover::before {
+            opacity: 1;
+        }
+
+        .day-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            position: relative;
+        }
+
+        .gregorian-date {
+            font-size: 36px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+
+        .lunar-date {
+            font-size: 22px;
+            color: var(--text-secondary);
+            line-height: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
+            font-weight: 500;
+        }
+
+        .calendar td.other-month {
+            opacity: 0.4;
+        }
+
+        .calendar td.other-month .gregorian-date {
+            color: var(--text-muted);
+        }
+
+        .calendar td.other-month .lunar-date {
+            color: var(--text-muted);
+        }
+
+        .calendar td.today {
+            background: var(--today-bg) !important;
+            border-color: var(--today-border) !important;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 4px 20px var(--today-shadow);
+        }
+
+        .calendar td.today .gregorian-date {
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .calendar td.sunday .gregorian-date {
+            color: var(--sunday-color);
+        }
+
+        .calendar td.sunday .lunar-date {
+            color: var(--sunday-secondary);
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--text-primary);
+            margin-bottom: 32px;
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .month-year-display {
+            text-align: center;
+            font-size: 28px;
+            font-weight: 600;
+            margin: 24px 0;
+            color: var(--text-primary);
+            letter-spacing: -0.3px;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>LunarCal</h1>
+
+        <div class="controls">
+            <label for="monthSelect">Month:</label>
+            <button id="prevMonthButton">←</button>
+            <select id="monthSelect">
+                <option value="0">January</option>
+                <option value="1">February</option>
+                <option value="2">March</option>
+                <option value="3">April</option>
+                <option value="4">May</option>
+                <option value="5">June</option>
+                <option value="6">July</option>
+                <option value="7">August</option>
+                <option value="8">September</option>
+                <option value="9">October</option>
+                <option value="10">November</option>
+                <option value="11">December</option>
+            </select>
+            <button id="nextMonthButton">→</button>
+
+            <label for="yearSelect">Year:</label>
+            <button id="prevYearButton">←</button>
+            <select id="yearSelect">
+                <!-- Years will be populated by JavaScript -->
+            </select>
+            <button id="nextYearButton">→</button>
+
+            <button id="todayButton">Go to Today</button>
+
+            <button id="themeToggle">🌙</button>
+
+            <button id="settingsButton">⚙️</button>
+        </div>
+
+        <div class="month-year-display" id="monthYearDisplay">
+            <!-- Current month and year will be displayed here -->
+        </div>
+
+        <table class="calendar" id="calendar">
+            <thead>
+                <tr>
+                    <th>Sun</th>
+                    <th>Mon</th>
+                    <th>Tue</th>
+                    <th>Wed</th>
+                    <th>Thu</th>
+                    <th>Fri</th>
+                    <th>Sat</th>
+                </tr>
+            </thead>
+            <tbody id="calendarBody">
+                <!-- Calendar days will be generated here -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Settings Panel -->
+    <div id="settingsPanel" class="settings-panel">
+        <div class="settings-content">
+            <div class="settings-header">
+                <h3>Settings</h3>
+                <button id="closeSettings">×</button>
+            </div>
+            <div class="settings-body">
+                <div class="setting-group">
+                    <label for="darkBgColor">Dark Mode Background:</label>
+                    <div class="color-picker-container">
+                        <input type="color" id="darkBgColor" value="#1e3a8a">
+                        <span class="color-label" id="darkBgLabel">#1e3a8a</span>
+                    </div>
+                </div>
+                <div class="setting-group">
+                    <label for="lightBgColor">Light Mode Background:</label>
+                    <div class="color-picker-container">
+                        <input type="color" id="lightBgColor" value="#dbeafe">
+                        <span class="color-label" id="lightBgLabel">#dbeafe</span>
+                    </div>
+                </div>
+                <div class="settings-actions">
+                    <button id="resetColors">Reset to Default</button>
+                    <button id="saveSettings">Save Settings</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const monthNames = [
+            "January", "February", "March", "April", "May", "June",
+            "July", "August", "September", "October", "November", "December"
+        ];
+
+        const monthSelect = document.getElementById('monthSelect');
+        const yearSelect = document.getElementById('yearSelect');
+        const monthYearDisplay = document.getElementById('monthYearDisplay');
+        const calendarBody = document.getElementById('calendarBody');
+
+        // Chinese lunar calendar data and functions
+        const lunarMonthNames = [
+            '正月', '二月', '三月', '四月', '五月', '六月',
+            '七月', '八月', '九月', '十月', '冬月', '腊月'
+        ];
+
+        const lunarDayNames = [
+            '初一', '初二', '初三', '初四', '初五', '初六', '初七', '初八', '初九', '初十',
+            '十一', '十二', '十三', '十四', '十五', '十六', '十七', '十八', '十九', '二十',
+            '廿一', '廿二', '廿三', '廿四', '廿五', '廿六', '廿七', '廿八', '廿九', '三十'
+        ];
+
+        // Accurate Chinese lunar calendar conversion using lunar-javascript library
+        function solarToLunar(solarDate) {
+            try {
+                // Use the lunar-javascript library for accurate conversion
+                const solar = Solar.fromDate(solarDate);
+                const lunar = solar.getLunar();
+
+                return {
+                    year: lunar.getYear(),
+                    month: lunar.getMonth(),
+                    day: lunar.getDay(),
+                    monthName: lunar.getMonthInChinese(),
+                    dayName: lunar.getDayInChinese()
+                };
+            } catch (error) {
+                // Fallback in case library fails
+                console.error('Lunar conversion error:', error);
+                return {
+                    year: solarDate.getFullYear(),
+                    month: 1,
+                    day: 1,
+                    monthName: '正月',
+                    dayName: '初一'
+                };
+            }
+        }
+
+        function formatLunarDate(lunarDate) {
+            // For the first day of the month, show the full month name
+            if (lunarDate.day === 1) {
+                if (lunarDate.monthName) {
+                    // Ensure the month name includes "月" suffix
+                    let monthName = lunarDate.monthName;
+                    if (!monthName.endsWith('月') && monthName !== '正月' && monthName !== '冬月' && monthName !== '腊月') {
+                        monthName = monthName + '月';
+                    }
+                    return monthName;
+                } else {
+                    // Fallback to our custom arrays
+                    return lunarMonthNames[lunarDate.month - 1] || '正月';
+                }
+            }
+
+            // For other days, show the day name
+            if (lunarDate.dayName) {
+                return lunarDate.dayName;
+            } else {
+                // Fallback to our custom arrays
+                return lunarDayNames[lunarDate.day - 1] || '初一';
+            }
+        }
+
+        function populateYears() {
+            const currentYear = new Date().getFullYear();
+            for (let year = currentYear - 100; year <= currentYear + 100; year++) {
+                const option = document.createElement('option');
+                option.value = year;
+                option.textContent = year;
+                yearSelect.appendChild(option);
+            }
+        }
+
+        function generateCalendar(month, year) {
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            const startDate = new Date(firstDay);
+            startDate.setDate(startDate.getDate() - firstDay.getDay());
+
+            const today = new Date();
+            const isCurrentMonth = today.getMonth() === month && today.getFullYear() === year;
+            const todayDate = today.getDate();
+
+            monthYearDisplay.textContent = `${monthNames[month]} ${year}`;
+
+            calendarBody.innerHTML = '';
+
+            let currentDate = new Date(startDate);
+
+            for (let week = 0; week < 6; week++) {
+                const row = document.createElement('tr');
+
+                for (let day = 0; day < 7; day++) {
+                    const cell = document.createElement('td');
+                    const dayNumber = currentDate.getDate();
+
+                    // Create day content container
+                    const dayContent = document.createElement('div');
+                    dayContent.className = 'day-content';
+
+                    // Gregorian date
+                    const gregorianDiv = document.createElement('div');
+                    gregorianDiv.className = 'gregorian-date';
+                    gregorianDiv.textContent = dayNumber;
+                    dayContent.appendChild(gregorianDiv);
+
+                    // Lunar date
+                    const lunarDate = solarToLunar(new Date(currentDate));
+                    const lunarDiv = document.createElement('div');
+                    lunarDiv.className = 'lunar-date';
+                    lunarDiv.textContent = formatLunarDate(lunarDate);
+                    dayContent.appendChild(lunarDiv);
+
+                    cell.appendChild(dayContent);
+
+                    // Check if it's Sunday (day 0 is Sunday)
+                    if (currentDate.getDay() === 0) {
+                        cell.classList.add('sunday');
+                    }
+
+                    if (currentDate.getMonth() !== month) {
+                        cell.classList.add('other-month');
+                    }
+
+                    if (isCurrentMonth && dayNumber === todayDate && currentDate.getMonth() === month) {
+                        cell.classList.add('today');
+                    }
+
+                    row.appendChild(cell);
+                    currentDate.setDate(currentDate.getDate() + 1);
+                }
+
+                calendarBody.appendChild(row);
+
+                if (currentDate.getMonth() !== month && week >= 4) {
+                    break;
+                }
+            }
+        }
+
+        function updateCalendar() {
+            const selectedMonth = parseInt(monthSelect.value);
+            const selectedYear = parseInt(yearSelect.value);
+            generateCalendar(selectedMonth, selectedYear);
+        }
+
+        function goToToday() {
+            const now = new Date();
+            monthSelect.value = now.getMonth();
+            yearSelect.value = now.getFullYear();
+            generateCalendar(now.getMonth(), now.getFullYear());
+        }
+
+        function goToPreviousMonth() {
+            let currentMonth = parseInt(monthSelect.value);
+            let currentYear = parseInt(yearSelect.value);
+
+            currentMonth--;
+            if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
+            }
+
+            monthSelect.value = currentMonth;
+            yearSelect.value = currentYear;
+            generateCalendar(currentMonth, currentYear);
+        }
+
+        function goToNextMonth() {
+            let currentMonth = parseInt(monthSelect.value);
+            let currentYear = parseInt(yearSelect.value);
+
+            currentMonth++;
+            if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            }
+
+            monthSelect.value = currentMonth;
+            yearSelect.value = currentYear;
+            generateCalendar(currentMonth, currentYear);
+        }
+
+        function goToPreviousYear() {
+            let currentMonth = parseInt(monthSelect.value);
+            let currentYear = parseInt(yearSelect.value);
+
+            currentYear--;
+            monthSelect.value = currentMonth;
+            yearSelect.value = currentYear;
+            generateCalendar(currentMonth, currentYear);
+        }
+
+        function goToNextYear() {
+            let currentMonth = parseInt(monthSelect.value);
+            let currentYear = parseInt(yearSelect.value);
+
+            currentYear++;
+            monthSelect.value = currentMonth;
+            yearSelect.value = currentYear;
+            generateCalendar(currentMonth, currentYear);
+        }
+
+        function initialize() {
+            initializeTheme();
+            initializeColors();
+            populateYears();
+
+            const now = new Date();
+            monthSelect.value = now.getMonth();
+            yearSelect.value = now.getFullYear();
+
+            generateCalendar(now.getMonth(), now.getFullYear());
+
+            monthSelect.addEventListener('change', updateCalendar);
+            yearSelect.addEventListener('change', updateCalendar);
+            document.getElementById('todayButton').addEventListener('click', goToToday);
+            document.getElementById('prevMonthButton').addEventListener('click', goToPreviousMonth);
+            document.getElementById('nextMonthButton').addEventListener('click', goToNextMonth);
+            document.getElementById('prevYearButton').addEventListener('click', goToPreviousYear);
+            document.getElementById('nextYearButton').addEventListener('click', goToNextYear);
+            document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+            document.getElementById('settingsButton').addEventListener('click', openSettings);
+            document.getElementById('closeSettings').addEventListener('click', closeSettings);
+            document.getElementById('saveSettings').addEventListener('click', saveSettings);
+            document.getElementById('resetColors').addEventListener('click', resetColors);
+            document.getElementById('darkBgColor').addEventListener('input', updateColorLabel);
+            document.getElementById('lightBgColor').addEventListener('input', updateColorLabel);
+        }
+
+        // Settings functionality
+        function openSettings() {
+            document.getElementById('settingsPanel').classList.add('show');
+            loadCurrentColors();
+        }
+
+        function closeSettings() {
+            document.getElementById('settingsPanel').classList.remove('show');
+        }
+
+        function loadCurrentColors() {
+            const darkColor = localStorage.getItem('darkBgColor') || '#1e3a8a';
+            const lightColor = localStorage.getItem('lightBgColor') || '#dbeafe';
+
+            document.getElementById('darkBgColor').value = darkColor;
+            document.getElementById('lightBgColor').value = lightColor;
+            document.getElementById('darkBgLabel').textContent = darkColor;
+            document.getElementById('lightBgLabel').textContent = lightColor;
+        }
+
+        function updateColorLabel(event) {
+            const colorValue = event.target.value;
+            const labelId = event.target.id === 'darkBgColor' ? 'darkBgLabel' : 'lightBgLabel';
+            document.getElementById(labelId).textContent = colorValue;
+        }
+
+        function saveSettings() {
+            const darkColor = document.getElementById('darkBgColor').value;
+            const lightColor = document.getElementById('lightBgColor').value;
+
+            localStorage.setItem('darkBgColor', darkColor);
+            localStorage.setItem('lightBgColor', lightColor);
+
+            updateBackgroundColors(darkColor, lightColor);
+            closeSettings();
+        }
+
+        function resetColors() {
+            const defaultDark = '#1e3a8a';
+            const defaultLight = '#dbeafe';
+
+            document.getElementById('darkBgColor').value = defaultDark;
+            document.getElementById('lightBgColor').value = defaultLight;
+            document.getElementById('darkBgLabel').textContent = defaultDark;
+            document.getElementById('lightBgLabel').textContent = defaultLight;
+
+            localStorage.removeItem('darkBgColor');
+            localStorage.removeItem('lightBgColor');
+
+            updateBackgroundColors(defaultDark, defaultLight);
+        }
+
+        function updateBackgroundColors(darkColor, lightColor) {
+            const root = document.documentElement;
+
+            // Create gradients from the selected colors
+            const darkGradientEnd = adjustBrightness(darkColor, 20);
+            const lightGradientEnd = adjustBrightness(lightColor, -10);
+
+            // Store the custom colors
+            root.style.setProperty('--custom-dark-start', darkColor);
+            root.style.setProperty('--custom-dark-end', darkGradientEnd);
+            root.style.setProperty('--custom-light-start', lightColor);
+            root.style.setProperty('--custom-light-end', lightGradientEnd);
+
+            // Apply colors based on current theme
+            const currentTheme = document.body.dataset.theme;
+            if (currentTheme === 'light') {
+                root.style.setProperty('--bg-gradient-start', lightColor);
+                root.style.setProperty('--bg-gradient-end', lightGradientEnd);
+            } else {
+                root.style.setProperty('--bg-gradient-start', darkColor);
+                root.style.setProperty('--bg-gradient-end', darkGradientEnd);
+            }
+        }
+
+        function adjustBrightness(hex, percent) {
+            const num = parseInt(hex.replace('#', ''), 16);
+            const amt = Math.round(2.55 * percent);
+            const R = (num >> 16) + amt;
+            const G = (num >> 8 & 0x00FF) + amt;
+            const B = (num & 0x0000FF) + amt;
+            return '#' + (0x1000000 + (R < 255 ? R < 1 ? 0 : R : 255) * 0x10000 +
+                (G < 255 ? G < 1 ? 0 : G : 255) * 0x100 +
+                (B < 255 ? B < 1 ? 0 : B : 255))
+                .toString(16).slice(1);
+        }
+
+        function initializeColors() {
+            const savedDarkColor = localStorage.getItem('darkBgColor');
+            const savedLightColor = localStorage.getItem('lightBgColor');
+
+            if (savedDarkColor || savedLightColor) {
+                updateBackgroundColors(
+                    savedDarkColor || '#1e3a8a',
+                    savedLightColor || '#dbeafe'
+                );
+            }
+        }
+
+        // Close settings when clicking outside
+        document.addEventListener('click', function(event) {
+            const settingsPanel = document.getElementById('settingsPanel');
+            const settingsContent = document.querySelector('.settings-content');
+            const settingsButton = document.getElementById('settingsButton');
+
+            if (settingsPanel.classList.contains('show') &&
+                !settingsContent.contains(event.target) &&
+                event.target !== settingsButton) {
+                closeSettings();
+            }
+        });
+
+        // Update theme toggle to also update colors
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.getElementById('themeToggle');
+            const root = document.documentElement;
+
+            if (body.dataset.theme === 'light') {
+                body.dataset.theme = 'dark';
+                themeToggle.textContent = '🌙';
+                localStorage.setItem('theme', 'dark');
+
+                // Apply dark theme colors
+                const savedDarkColor = localStorage.getItem('darkBgColor') || '#1e3a8a';
+                const darkGradientEnd = adjustBrightness(savedDarkColor, 20);
+                root.style.setProperty('--bg-gradient-start', savedDarkColor);
+                root.style.setProperty('--bg-gradient-end', darkGradientEnd);
+            } else {
+                body.dataset.theme = 'light';
+                themeToggle.textContent = '☀️';
+                localStorage.setItem('theme', 'light');
+
+                // Apply light theme colors
+                const savedLightColor = localStorage.getItem('lightBgColor') || '#dbeafe';
+                const lightGradientEnd = adjustBrightness(savedLightColor, -10);
+                root.style.setProperty('--bg-gradient-start', savedLightColor);
+                root.style.setProperty('--bg-gradient-end', lightGradientEnd);
+            }
+
+            // Force refresh calendar styling after theme switch
+            setTimeout(() => {
+                refreshCalendarStyling();
+            }, 50);
+        }
+
+        function refreshCalendarStyling() {
+            // Force browser to recalculate styles by triggering a reflow
+            const calendar = document.getElementById('calendar');
+            if (calendar) {
+                calendar.style.display = 'none';
+                calendar.offsetHeight; // Trigger reflow
+                calendar.style.display = '';
+            }
+        }
+
+
+        function initializeTheme() {
+            const body = document.body;
+            const themeToggle = document.getElementById('themeToggle');
+            const savedTheme = localStorage.getItem('theme');
+            const root = document.documentElement;
+
+            if (savedTheme === 'light') {
+                body.dataset.theme = 'light';
+                themeToggle.textContent = '☀️';
+
+                // Apply saved light theme colors
+                const savedLightColor = localStorage.getItem('lightBgColor') || '#dbeafe';
+                const lightGradientEnd = adjustBrightness(savedLightColor, -10);
+                root.style.setProperty('--bg-gradient-start', savedLightColor);
+                root.style.setProperty('--bg-gradient-end', lightGradientEnd);
+            } else {
+                body.dataset.theme = 'dark';
+                themeToggle.textContent = '🌙';
+
+                // Apply saved dark theme colors
+                const savedDarkColor = localStorage.getItem('darkBgColor') || '#1e3a8a';
+                const darkGradientEnd = adjustBrightness(savedDarkColor, 20);
+                root.style.setProperty('--bg-gradient-start', savedDarkColor);
+                root.style.setProperty('--bg-gradient-end', darkGradientEnd);
+            }
+        }
+
+        initialize();
+    </script>
+</body>
+</html>
