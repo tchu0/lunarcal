@@ -91,6 +91,12 @@
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+        }
+
         .container {
             background: var(--container-bg);
             backdrop-filter: blur(20px) saturate(180%);
@@ -106,6 +112,13 @@
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             width: 100%;
             max-width: none;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 16px;
+                border-radius: 20px;
+            }
         }
 
         .container::before {
@@ -133,6 +146,15 @@
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
         }
 
+        @media (max-width: 768px) {
+            .controls {
+                padding: 12px;
+                gap: 8px;
+                margin-bottom: 20px;
+                border-radius: 16px;
+            }
+        }
+
         label {
             color: rgba(255, 255, 255, 0.8);
             font-weight: 500;
@@ -152,6 +174,16 @@
             color: var(--text-primary);
             cursor: pointer;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            min-height: 44px;
+        }
+
+        @media (max-width: 768px) {
+            select {
+                padding: 12px 14px;
+                font-size: 16px; /* Prevent zoom on iOS */
+                min-height: 48px;
+                min-width: 120px;
+            }
         }
 
         select option {
@@ -186,6 +218,16 @@
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
             overflow: hidden;
+            min-height: 44px; /* Touch target size */
+        }
+
+        @media (max-width: 768px) {
+            button {
+                padding: 14px 18px;
+                font-size: 15px;
+                min-height: 48px; /* Larger touch targets on mobile */
+                min-width: 48px;
+            }
         }
 
         button::before {
@@ -281,6 +323,15 @@
             max-width: 400px;
             width: 90%;
             animation: slideIn 0.3s ease;
+        }
+
+        @media (max-width: 480px) {
+            .settings-content {
+                width: 95%;
+                max-width: none;
+                margin: 20px;
+                border-radius: 16px;
+            }
         }
 
         @keyframes slideIn {
@@ -461,6 +512,30 @@
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
+        @media (max-width: 768px) {
+            .calendar td {
+                height: 80px;
+                padding: 6px;
+            }
+
+            .calendar th {
+                padding: 12px 6px;
+                font-size: 16px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .calendar td {
+                height: 70px;
+                padding: 4px;
+            }
+
+            .calendar th {
+                padding: 8px 4px;
+                font-size: 14px;
+            }
+        }
+
         .calendar td::before {
             content: '';
             position: absolute;
@@ -511,6 +586,28 @@
             font-weight: 500;
         }
 
+        @media (max-width: 768px) {
+            .gregorian-date {
+                font-size: 24px;
+                margin-bottom: 4px;
+            }
+
+            .lunar-date {
+                font-size: 16px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .gregorian-date {
+                font-size: 20px;
+                margin-bottom: 2px;
+            }
+
+            .lunar-date {
+                font-size: 14px;
+            }
+        }
+
         .calendar td.other-month {
             opacity: 0.4;
         }
@@ -551,6 +648,20 @@
             font-weight: 700;
             letter-spacing: -0.5px;
             text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 28px;
+                margin-bottom: 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 24px;
+                margin-bottom: 16px;
+            }
         }
 
         .month-year-display {
@@ -1082,5 +1193,9 @@
 
         initialize();
     </script>
+
+    <footer style="text-align: center; margin-top: 20px; color: var(--text-muted); font-size: 12px;">
+        Copyright &copy; 2025 Tat Chu
+    </footer>
 </body>
 </html>
