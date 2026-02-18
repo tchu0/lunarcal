@@ -1,62 +1,55 @@
 # Technical Documentation
 
-This document provides detailed technical information for developers working on the LunarCal.
+Notes for anyone working on LunarCal.
 
-## 📋 Table of Contents
+## Table of Contents
 
 - [Architecture Overview](#architecture-overview)
 - [Code Structure](#code-structure)
 - [API Reference](#api-reference)
 - [Styling System](#styling-system)
 - [State Management](#state-management)
-- [Performance Considerations](#performance-considerations)
+- [Performance](#performance)
 - [Browser Compatibility](#browser-compatibility)
 
-## 🏗️ Architecture Overview
+## Architecture Overview
 
-The LunarCal follows a **single-file architecture** for simplicity and ease of deployment. The entire application is contained within `calendar.html`.
+Everything lives in a single `calendar.html` file. No build step, no frameworks.
 
-### Design Principles
-- **Vanilla JavaScript**: No frameworks to minimize complexity and size
-- **CSS Custom Properties**: Enable dynamic theming
-- **Progressive Enhancement**: Core functionality works without JavaScript
-- **Mobile-First**: Responsive design starting from mobile devices
-- **Accessibility**: WCAG 2.1 AA compliance where possible
+### Principles
+- Vanilla JavaScript -- keeps things simple and small
+- CSS custom properties for theming
+- Mobile-first responsive design
+- Reasonable accessibility (WCAG 2.1 AA where practical)
 
 ### Dependencies
-- **[lunar-javascript](https://github.com/6tail/lunar-javascript)** v1.6.12: Chinese lunar calendar calculations
-- **Modern Browser APIs**: LocalStorage, CSS Custom Properties, Backdrop Filter
+- [lunar-javascript](https://github.com/6tail/lunar-javascript) v1.6.12 for lunar calendar math
+- Google Fonts: Newsreader (display) and DM Sans (body)
 
-## 📁 Code Structure
+## Code Structure
 
-### HTML Structure
+### HTML Layout
 ```html
 <!DOCTYPE html>
 <html>
 <head>
-  <!-- Meta tags, title, external dependencies -->
-  <script src="lunar-javascript CDN"></script>
+  <!-- Meta, title, fonts, lunar-javascript CDN -->
   <style>
-    /* CSS Variables for theming */
-    /* Component styles */
-    /* Theme-specific overrides */
+    /* CSS variables, component styles, responsive rules */
   </style>
 </head>
 <body>
-  <!-- Main calendar container -->
   <div class="container">
+    <!-- Header with title and action buttons -->
     <!-- Navigation controls -->
-    <div class="controls">...</div>
-
-    <!-- Calendar grid -->
-    <table class="calendar">...</table>
+    <!-- Calendar table -->
   </div>
 
   <!-- Settings modal -->
   <div id="settingsPanel">...</div>
 
   <script>
-    /* JavaScript functionality */
+    /* All JavaScript */
   </script>
 </body>
 </html>
@@ -64,315 +57,226 @@ The LunarCal follows a **single-file architecture** for simplicity and ease of d
 
 ### CSS Architecture
 
-#### CSS Custom Properties (Variables)
+#### Theme Variables
 ```css
 :root {
   /* Dark theme (default) */
-  --bg-gradient-start: #1e3a8a;
-  --text-primary: rgba(255, 255, 255, 0.95);
-  /* ... other variables */
+  --bg: #111110;
+  --text: #e8e4dd;
+  --accent: #c5453a;
+  /* ... */
 }
 
 [data-theme="light"] {
-  /* Light theme overrides */
-  --bg-gradient-start: #dbeafe;
-  --text-primary: rgba(0, 0, 0, 0.9);
-  /* ... other overrides */
+  --bg: #f5f0e8;
+  --text: #2c2a25;
+  --accent: #b33d33;
+  /* ... */
 }
 ```
 
-#### Component Structure
-- **Container**: Main application wrapper with glass morphism
-- **Controls**: Navigation and theme controls
-- **Calendar Grid**: Table-based calendar layout
-- **Settings Panel**: Modal overlay for customization
+#### Main Components
+- **Container**: Centered content wrapper
+- **Header**: Title and action buttons (theme toggle, settings)
+- **Controls**: Month/year navigation with dropdowns
+- **Calendar Grid**: Table-based layout with day cells
+- **Settings Panel**: Modal for color customization
 
-### JavaScript Modules
+### JavaScript Functions
 
-#### Core Functions
+#### Core
 ```javascript
-// Calendar Generation
 function generateCalendar(month, year)
 function updateCalendar()
+```
 
-// Navigation
+#### Navigation
+```javascript
 function goToPreviousMonth()
 function goToNextMonth()
+function goToPreviousYear()
+function goToNextYear()
 function goToToday()
+```
 
-// Theme Management
+#### Theme
+```javascript
 function toggleTheme()
 function initializeTheme()
+function updateThemeIcon()
 function updateBackgroundColors(darkColor, lightColor)
+```
 
-// Settings
+#### Settings
+```javascript
 function openSettings()
 function saveSettings()
+function resetColors()
 function loadCurrentColors()
+```
 
-// Lunar Calendar
+#### Lunar Calendar
+```javascript
 function solarToLunar(solarDate)
 function formatLunarDate(lunarDate)
 ```
 
-## 🔧 API Reference
+## API Reference
 
-### Core Calendar Functions
+### `generateCalendar(month, year)`
+Builds the calendar grid for a given month and year.
 
-#### `generateCalendar(month, year)`
-Generates the calendar grid for the specified month and year.
+- `month` (number): 0-11
+- `year` (number): four-digit year
 
-**Parameters:**
-- `month` (number): Month index (0-11)
-- `year` (number): Four-digit year
-
-**Example:**
 ```javascript
 generateCalendar(8, 2025); // September 2025
 ```
 
-#### `solarToLunar(solarDate)`
-Converts a Gregorian date to Chinese lunar calendar.
+### `solarToLunar(solarDate)`
+Converts a Gregorian date to Chinese lunar calendar data.
 
-**Parameters:**
-- `solarDate` (Date): JavaScript Date object
+- `solarDate` (Date): a JavaScript Date object
 
-**Returns:**
+Returns:
 ```javascript
 {
-  year: number,     // Lunar year
-  month: number,    // Lunar month (1-12)
-  day: number,      // Lunar day (1-30)
+  year: number,
+  month: number,    // 1-12
+  day: number,      // 1-30
   monthName: string, // Chinese month name
   dayName: string   // Chinese day name
 }
 ```
 
-### Theme Functions
+### `toggleTheme()`
+Switches between light and dark themes and updates colors.
 
-#### `toggleTheme()`
-Switches between light and dark themes, applying appropriate colors.
+### `updateBackgroundColors(darkColor, lightColor)`
+Sets the background gradient colors for both themes.
 
-#### `updateBackgroundColors(darkColor, lightColor)`
-Updates the background gradient colors for both themes.
+- `darkColor` (string): hex color for dark theme
+- `lightColor` (string): hex color for light theme
 
-**Parameters:**
-- `darkColor` (string): Hex color for dark theme
-- `lightColor` (string): Hex color for light theme
+### `saveSettings()`
+Writes current color choices to localStorage.
 
-### Settings Functions
+### `resetColors()`
+Restores default colors and clears saved preferences.
 
-#### `saveSettings()`
-Saves current color preferences to localStorage.
-
-#### `resetColors()`
-Resets colors to default values and clears localStorage.
-
-## 🎨 Styling System
+## Styling System
 
 ### CSS Custom Properties
 
-The application uses a comprehensive CSS custom properties system for theming:
+The app uses CSS variables for all colors and spacing:
 
 ```css
-/* Color System */
---text-primary: Primary text color
---text-secondary: Secondary/muted text
---text-muted: Very light text (disabled states)
+/* Text */
+--text: main text color
+--text-secondary: secondary text
+--text-muted: faint text
 
-/* Background System */
---bg-gradient-start: Background gradient start
---bg-gradient-end: Background gradient end
---container-bg: Main container background
---container-border: Container border color
+/* Backgrounds */
+--bg: page background
+--surface: card/cell background
+--surface-hover: hover state
 
-/* Component Colors */
---cell-bg: Calendar cell background
---cell-border: Calendar cell border
---cell-hover-bg: Calendar cell hover state
---button-bg: Button background
---button-border: Button border
---button-hover-bg: Button hover state
+/* Borders */
+--border: standard borders
+--border-subtle: lighter borders
 
-/* Special States */
---today-bg: Today's date highlight
---sunday-color: Sunday date text color
+/* Accent */
+--accent: cinnabar red, used for today and Sundays
+--accent-soft: light accent for backgrounds
+--today-bg: today cell background
+--sunday: Sunday text color
 ```
 
-### Glass Morphism Implementation
+### Responsive Breakpoints
 
-```css
-.glass-element {
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(20px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 20px;
-}
-```
+- Default: mobile
+- 640px+: small tablets
+- 768px+: tablets
+- 1024px+: desktop
 
-### Responsive Design
+## State Management
 
-Mobile-first approach with breakpoints:
-- **Mobile**: Default styles
-- **Tablet**: 768px+
-- **Desktop**: 1024px+
-
-## 💾 State Management
-
-### LocalStorage Schema
+### localStorage Keys
 
 ```javascript
-// Theme preference
-localStorage.setItem('theme', 'dark' | 'light');
-
-// Custom colors
-localStorage.setItem('darkBgColor', '#hexcolor');
-localStorage.setItem('lightBgColor', '#hexcolor');
+localStorage.getItem('theme');        // 'dark' or 'light'
+localStorage.getItem('darkBgColor');  // hex color string
+localStorage.getItem('lightBgColor'); // hex color string
 ```
 
-### State Synchronization
+### How State Stays in Sync
 
-The application maintains state consistency through:
-1. **Theme changes**: Update DOM data attributes and CSS variables
-2. **Color changes**: Update CSS variables and localStorage
-3. **Navigation**: Update dropdowns and regenerate calendar
+1. Theme changes update the `data-theme` attribute on `<body>` and CSS variables
+2. Color changes update CSS variables and localStorage
+3. Navigation updates the dropdowns and regenerates the calendar
 
-## ⚡ Performance Considerations
+## Performance
 
-### Optimization Strategies
+### What We Do
+- Rebuild only the calendar body on navigation (no full page re-render)
+- CSS transitions for animations (hardware-accelerated where possible)
+- No backdrop-filter or heavy GPU effects
+- Function-scoped variables to avoid polluting global scope
 
-#### Calendar Rendering
-- **Minimal DOM manipulation**: Only update necessary cells
-- **CSS transitions**: Hardware-accelerated animations
-- **Event delegation**: Single event listener for calendar interactions
+### Rough Targets
+- First paint: under 100ms
+- Calendar generation: under 50ms
+- Theme switch: under 100ms
 
-#### Memory Management
-- **No memory leaks**: Proper event listener cleanup
-- **Efficient date calculations**: Cache lunar calendar results
-- **Minimal global scope**: Function-scoped variables
-
-#### CSS Performance
-```css
-/* Efficient selectors */
-.calendar-cell { /* ... */ }
-
-/* Hardware acceleration */
-.animated-element {
-  transform: translateZ(0); /* Force GPU layer */
-  will-change: transform; /* Hint to browser */
-}
-
-/* Avoid expensive properties in animations */
-.transition-element {
-  transition: transform 0.2s ease; /* Good */
-  /* transition: box-shadow 0.2s ease; /* Avoid */
-}
-```
-
-### Performance Monitoring
-
-Key metrics to watch:
-- **First Paint**: < 100ms
-- **Calendar Generation**: < 50ms
-- **Theme Switch**: < 100ms
-- **Memory Usage**: < 10MB
-
-## 🌐 Browser Compatibility
+## Browser Compatibility
 
 ### Required Features
-- **CSS Custom Properties**: Chrome 49+, Firefox 31+, Safari 9.1+
-- **CSS Grid**: Chrome 57+, Firefox 52+, Safari 10.1+
-- **Backdrop Filter**: Chrome 76+, Firefox 103+, Safari 18.0+
-- **ES6+ JavaScript**: Chrome 51+, Firefox 54+, Safari 10+
+- CSS Custom Properties: Chrome 49+, Firefox 31+, Safari 9.1+
+- CSS Grid: Chrome 57+, Firefox 52+, Safari 10.1+
+- ES6 JavaScript: Chrome 51+, Firefox 54+, Safari 10+
 
-### Fallback Strategies
+### Tested Browsers
 
-#### Backdrop Filter
-```css
-.glass-element {
-  background: rgba(255, 255, 255, 0.9); /* Fallback */
-  backdrop-filter: blur(20px); /* Progressive enhancement */
-}
-```
+| Browser | Version | Works |
+|---------|---------|-------|
+| Chrome | 88+ | Yes |
+| Firefox | 94+ | Yes |
+| Safari | 15.4+ | Yes |
+| Edge | 88+ | Yes |
+| Chrome Mobile | 88+ | Yes |
+| Safari iOS | 15.4+ | Yes |
 
-#### CSS Grid
-```css
-.calendar {
-  display: table; /* Fallback */
-  display: grid; /* Progressive enhancement */
-}
-```
+## Debugging
 
-### Testing Matrix
-
-| Browser | Version | Status |
-|---------|---------|---------|
-| Chrome | 88+ | ✅ Full support |
-| Firefox | 94+ | ✅ Full support |
-| Safari | 15.4+ | ✅ Full support |
-| Edge | 88+ | ✅ Full support |
-| Chrome Mobile | 88+ | ✅ Full support |
-| Safari iOS | 15.4+ | ✅ Full support |
-
-## 🔍 Debugging Guide
-
-### Common Issues
-
-#### Theme not switching properly
+### Theme not switching
 ```javascript
-// Check DOM data attribute
 console.log(document.body.dataset.theme);
-
-// Check CSS variable values
 console.log(getComputedStyle(document.documentElement)
-  .getPropertyValue('--bg-gradient-start'));
+  .getPropertyValue('--bg'));
 ```
 
-#### Lunar dates incorrect
+### Lunar dates look wrong
 ```javascript
-// Test lunar conversion
 const testDate = new Date(2025, 8, 13); // Sept 13, 2025
-const lunarResult = solarToLunar(testDate);
-console.log('Lunar result:', lunarResult);
+console.log(solarToLunar(testDate));
 ```
 
-#### Settings not persisting
+### Settings not saving
 ```javascript
-// Check localStorage
-console.log('Saved theme:', localStorage.getItem('theme'));
-console.log('Saved colors:', {
+console.log({
+  theme: localStorage.getItem('theme'),
   dark: localStorage.getItem('darkBgColor'),
   light: localStorage.getItem('lightBgColor')
 });
 ```
 
-### Development Tools
-
-#### Browser DevTools
-1. **Elements**: Inspect CSS variables and DOM structure
-2. **Console**: Debug JavaScript and test functions
-3. **Application**: Check localStorage values
-4. **Performance**: Monitor rendering performance
-
-#### Useful Console Commands
+### Handy Console Commands
 ```javascript
-// Test theme switching
 toggleTheme();
-
-// Generate specific month
 generateCalendar(11, 2025); // December 2025
-
-// Test color changes
 updateBackgroundColors('#ff0000', '#00ff00');
-
-// Check current settings
-console.log({
-  theme: document.body.dataset.theme,
-  darkColor: localStorage.getItem('darkBgColor'),
-  lightColor: localStorage.getItem('lightBgColor')
-});
 ```
 
 ---
 
-This documentation is maintained alongside the codebase. When making changes, please update the relevant sections to keep it accurate and helpful for future developers.
+Keep this file up to date when making changes to the codebase.

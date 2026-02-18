@@ -5,578 +5,362 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LunarCal</title>
     <script src="https://cdn.jsdelivr.net/npm/lunar-javascript@1.6.12/lunar.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            /* Light theme variables */
-            --bg-gradient-start: #1e3a8a;
-            --bg-gradient-end: #1e40af;
-            --container-bg: rgba(255, 255, 255, 0.15);
-            --container-border: rgba(255, 255, 255, 0.2);
-            --container-highlight: rgba(255, 255, 255, 0.3);
-            --text-primary: rgba(255, 255, 255, 0.95);
-            --text-secondary: rgba(255, 255, 255, 0.65);
-            --text-muted: rgba(255, 255, 255, 0.4);
-            --controls-bg: rgba(255, 255, 255, 0.08);
-            --controls-border: rgba(255, 255, 255, 0.15);
-            --cell-bg: rgba(255, 255, 255, 0.08);
-            --cell-border: rgba(255, 255, 255, 0.1);
-            --cell-hover-bg: rgba(255, 255, 255, 0.15);
-            --button-bg: rgba(255, 255, 255, 0.12);
-            --button-border: rgba(255, 255, 255, 0.2);
-            --button-hover-bg: rgba(255, 255, 255, 0.18);
-            --today-bg: rgba(0, 122, 255, 0.25);
-            --today-border: rgba(0, 122, 255, 0.4);
-            --today-shadow: rgba(0, 122, 255, 0.3);
-            --sunday-color: rgba(255, 89, 94, 0.95);
-            --sunday-secondary: rgba(255, 89, 94, 0.7);
+            /* Ink & Paper — dark mode (deep ink) */
+            --bg: #111110;
+            --bg-subtle: #1a1a18;
+            --surface: #222220;
+            --surface-raised: #2a2a28;
+            --surface-hover: #333330;
+            --border: #333330;
+            --border-subtle: #2a2a28;
+            --text: #e8e4dd;
+            --text-secondary: #a09a8f;
+            --text-muted: #5c574e;
+            --accent: #c5453a;
+            --accent-soft: rgba(197, 69, 58, 0.15);
+            --accent-hover: rgba(197, 69, 58, 0.25);
+            --today-bg: rgba(197, 69, 58, 0.12);
+            --today-border: rgba(197, 69, 58, 0.35);
+            --sunday: #c5453a;
+            --sunday-soft: rgba(197, 69, 58, 0.7);
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.2);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.25);
+            --shadow-lg: 0 8px 30px rgba(0,0,0,0.3);
+            --radius: 8px;
+            --radius-lg: 14px;
+            --font-display: 'Newsreader', 'Georgia', serif;
+            --font-body: 'DM Sans', -apple-system, sans-serif;
+
+            /* Custom background overrides */
+            --bg-gradient-start: #111110;
+            --bg-gradient-end: #1a1a18;
         }
 
         [data-theme="light"] {
-            --bg-gradient-start: #dbeafe;
-            --bg-gradient-end: #bfdbfe;
-            --container-bg: rgba(255, 255, 255, 0.4);
-            --container-border: rgba(255, 255, 255, 0.6);
-            --container-highlight: rgba(255, 255, 255, 0.8);
-            --text-primary: rgba(0, 0, 0, 0.9);
-            --text-secondary: rgba(0, 0, 0, 0.65);
-            --text-muted: rgba(0, 0, 0, 0.4);
-            --controls-bg: rgba(255, 255, 255, 0.3);
-            --controls-border: rgba(255, 255, 255, 0.5);
-            --cell-bg: rgba(255, 255, 255, 0.25);
-            --cell-border: rgba(255, 255, 255, 0.4);
-            --cell-hover-bg: rgba(255, 255, 255, 0.4);
-            --button-bg: rgba(255, 255, 255, 0.3);
-            --button-border: rgba(255, 255, 255, 0.5);
-            --button-hover-bg: rgba(255, 255, 255, 0.45);
-            --today-bg: rgba(0, 122, 255, 0.2);
-            --today-border: rgba(0, 122, 255, 0.4);
-            --today-shadow: rgba(0, 122, 255, 0.2);
-            --sunday-color: rgba(255, 59, 48, 0.9);
-            --sunday-secondary: rgba(255, 59, 48, 0.6);
-        }
-
-        /* Explicit theme overrides to prevent styling issues on theme switch */
-        body[data-theme="dark"] .calendar td,
-        body:not([data-theme="light"]) .calendar td {
-            background: var(--cell-bg) !important;
-            border-color: var(--cell-border) !important;
-        }
-
-        body[data-theme="dark"] .calendar th,
-        body:not([data-theme="light"]) .calendar th {
-            background: var(--cell-bg) !important;
-            border-color: var(--cell-border) !important;
-        }
-
-        body[data-theme="light"] .calendar td {
-            background: var(--cell-bg) !important;
-            border-color: var(--cell-border) !important;
-        }
-
-        body[data-theme="light"] .calendar th {
-            background: var(--cell-bg) !important;
-            border-color: var(--cell-border) !important;
+            --bg: #f5f0e8;
+            --bg-subtle: #efe9df;
+            --surface: #ffffff;
+            --surface-raised: #ffffff;
+            --surface-hover: #f9f6f1;
+            --border: #e0d9cd;
+            --border-subtle: #ebe5da;
+            --text: #2c2a25;
+            --text-secondary: #7a746a;
+            --text-muted: #b5afa4;
+            --accent: #b33d33;
+            --accent-soft: rgba(179, 61, 51, 0.1);
+            --accent-hover: rgba(179, 61, 51, 0.18);
+            --today-bg: rgba(179, 61, 51, 0.08);
+            --today-border: rgba(179, 61, 51, 0.3);
+            --sunday: #b33d33;
+            --sunday-soft: rgba(179, 61, 51, 0.65);
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+            --shadow-md: 0 2px 8px rgba(0,0,0,0.06);
+            --shadow-lg: 0 4px 20px rgba(0,0,0,0.08);
+            --bg-gradient-start: #f5f0e8;
+            --bg-gradient-end: #efe9df;
         }
 
         * {
             box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+            font-family: var(--font-body);
+            background: linear-gradient(170deg, var(--bg-gradient-start), var(--bg-gradient-end));
             min-height: 100vh;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            color: var(--text);
+            transition: background 0.4s ease, color 0.3s ease;
+            -webkit-font-smoothing: antialiased;
         }
 
-        @media (max-width: 768px) {
-            body {
-                padding: 10px;
-            }
-        }
+        /* ── Layout ─────────────────────────── */
 
         .container {
-            background: var(--container-bg);
-            backdrop-filter: blur(20px) saturate(180%);
-            border: 1px solid var(--container-border);
-            border-radius: 24px;
-            padding: 32px;
-            box-shadow:
-                0 20px 40px rgba(0, 0, 0, 0.1),
-                0 8px 16px rgba(0, 0, 0, 0.08),
-                inset 0 1px 0 var(--container-highlight);
-            position: relative;
-            overflow: hidden;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            width: 100%;
-            max-width: none;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 48px;
         }
 
         @media (max-width: 768px) {
-            .container {
-                padding: 16px;
-                border-radius: 20px;
-            }
+            .container { padding: 20px 16px; }
         }
 
-        .container::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+        /* ── Header ─────────────────────────── */
+
+        .header {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            margin-bottom: 36px;
+            flex-wrap: wrap;
+            gap: 16px;
         }
+
+        h1 {
+            font-family: var(--font-display);
+            font-size: 28px;
+            font-weight: 400;
+            letter-spacing: -0.02em;
+            color: var(--text);
+        }
+
+        h1 span {
+            color: var(--text-muted);
+            font-weight: 400;
+            font-size: 16px;
+            margin-left: 12px;
+            font-family: var(--font-body);
+            letter-spacing: 0;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+
+        /* ── Controls ───────────────────────── */
 
         .controls {
             display: flex;
+            align-items: center;
+            justify-content: space-between;
             gap: 12px;
             margin-bottom: 32px;
-            align-items: center;
-            justify-content: center;
             flex-wrap: wrap;
-            padding: 20px;
-            background: rgba(255, 255, 255, 0.08);
-            border-radius: 18px;
-            backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
         }
 
-        @media (max-width: 768px) {
-            .controls {
-                padding: 12px;
-                gap: 8px;
-                margin-bottom: 20px;
-                border-radius: 16px;
-            }
+        .controls-group {
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
 
-        label {
-            color: rgba(255, 255, 255, 0.8);
-            font-weight: 500;
-            font-size: 14px;
-            letter-spacing: 0.3px;
-            text-transform: uppercase;
+        .month-year-display {
+            font-family: var(--font-display);
+            font-size: 26px;
+            font-weight: 600;
+            color: var(--text);
+            letter-spacing: -0.01em;
+            text-align: center;
+            flex: 1;
+            min-width: 200px;
         }
 
         select {
-            padding: 10px 16px;
-            border: 1px solid var(--button-border);
-            border-radius: 12px;
-            font-size: 16px;
+            font-family: var(--font-body);
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            font-size: 14px;
             font-weight: 500;
-            background: var(--button-bg);
-            backdrop-filter: blur(10px);
-            color: var(--text-primary);
+            background: var(--surface);
+            color: var(--text);
             cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            min-height: 44px;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+            min-height: 38px;
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M3 5l3 3 3-3' fill='none' stroke='%237a746a' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            padding-right: 30px;
+        }
+
+        select:hover { border-color: var(--text-muted); }
+
+        select:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px var(--accent-soft);
         }
 
         @media (max-width: 768px) {
             select {
-                padding: 12px 14px;
-                font-size: 16px; /* Prevent zoom on iOS */
-                min-height: 48px;
-                min-width: 120px;
+                font-size: 16px;
+                min-height: 44px;
+                padding: 10px 14px;
+                padding-right: 32px;
             }
         }
 
-        select option {
-            background: var(--container-bg);
-            color: var(--text-primary);
-            padding: 8px;
-        }
-
-        select:hover {
-            background: var(--button-hover-bg);
-            border-color: var(--container-border);
-            transform: translateY(-1px);
-        }
-
-        select:focus {
-            outline: none;
-            background: var(--button-hover-bg);
-            border-color: var(--container-border);
-            box-shadow: 0 0 0 3px var(--controls-bg);
-        }
-
         button {
-            padding: 12px 20px;
-            border: 1px solid var(--button-border);
-            border-radius: 14px;
-            font-size: 16px;
-            font-weight: 600;
-            background: var(--button-bg);
-            backdrop-filter: blur(10px);
-            color: var(--text-primary);
+            font-family: var(--font-body);
+            padding: 8px 16px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            font-size: 14px;
+            font-weight: 500;
+            background: var(--surface);
+            color: var(--text);
             cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
-            min-height: 44px; /* Touch target size */
+            transition: all 0.15s ease;
+            min-height: 38px;
+            line-height: 1;
+        }
+
+        button:hover {
+            background: var(--surface-hover);
+            border-color: var(--text-muted);
+        }
+
+        button:active {
+            transform: scale(0.98);
         }
 
         @media (max-width: 768px) {
             button {
-                padding: 14px 18px;
+                min-height: 44px;
+                min-width: 44px;
+                padding: 10px 14px;
                 font-size: 15px;
-                min-height: 48px; /* Larger touch targets on mobile */
-                min-width: 48px;
             }
         }
 
-        button::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, var(--container-highlight), transparent);
-            transition: left 0.6s ease;
-        }
-
-        button:hover {
-            background: var(--button-hover-bg);
-            border-color: var(--container-border);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-        }
-
-        button:hover::before {
-            left: 100%;
-        }
-
-        button:active {
-            transform: translateY(0);
-            background: var(--button-hover-bg);
-        }
-
-        #prevMonthButton, #nextMonthButton, #prevYearButton, #nextYearButton {
-            padding: 10px 14px;
-            min-width: 44px;
-            font-size: 18px;
-            border-radius: 12px;
-        }
-
-        #prevMonthButton, #nextMonthButton, #prevYearButton, #nextYearButton {
-            color: var(--text-primary);
-        }
-
-        #todayButton {
-            background: rgba(0, 122, 255, 0.2);
-            border-color: rgba(0, 122, 255, 0.3);
-            color: var(--text-primary);
-        }
-
-        #todayButton:hover {
-            background: rgba(0, 122, 255, 0.3);
-            border-color: rgba(0, 122, 255, 0.4);
-        }
-
-        #themeToggle, #settingsButton {
-            min-width: 50px;
-            font-size: 20px;
-            padding: 10px;
-            color: var(--text-primary);
-        }
-
-        /* Settings Panel Styles */
-        .settings-panel {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(10px);
-            display: none;
+        .btn-icon {
+            padding: 8px 10px;
+            min-width: 38px;
+            display: flex;
+            align-items: center;
             justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .settings-panel.show {
-            display: flex;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        .settings-content {
-            background: var(--container-bg);
-            backdrop-filter: blur(20px) saturate(180%);
-            border: 1px solid var(--container-border);
-            border-radius: 20px;
-            padding: 0;
-            box-shadow:
-                0 20px 40px rgba(0, 0, 0, 0.2),
-                0 8px 16px rgba(0, 0, 0, 0.1);
-            max-width: 400px;
-            width: 90%;
-            animation: slideIn 0.3s ease;
-        }
-
-        @media (max-width: 480px) {
-            .settings-content {
-                width: 95%;
-                max-width: none;
-                margin: 20px;
-                border-radius: 16px;
-            }
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-20px) scale(0.95);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
-        }
-
-        .settings-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 24px 24px 16px;
-            border-bottom: 1px solid var(--cell-border);
-        }
-
-        .settings-header h3 {
-            margin: 0;
-            color: var(--text-primary);
-            font-size: 24px;
-            font-weight: 600;
-        }
-
-        #closeSettings {
-            background: none;
-            border: none;
-            font-size: 24px;
-            cursor: pointer;
-            color: var(--text-secondary);
-            padding: 4px 8px;
-            border-radius: 6px;
-            transition: all 0.2s ease;
-        }
-
-        #closeSettings:hover {
-            background: var(--cell-hover-bg);
-            color: var(--text-primary);
-            transform: none;
-            box-shadow: none;
-        }
-
-        .settings-body {
-            padding: 24px;
-        }
-
-        .setting-group {
-            margin-bottom: 24px;
-        }
-
-        .setting-group:last-of-type {
-            margin-bottom: 0;
-        }
-
-        .setting-group label {
-            display: block;
-            margin-bottom: 8px;
-            color: var(--text-primary);
-            font-weight: 500;
-            text-transform: none;
             font-size: 16px;
-            letter-spacing: normal;
-        }
-
-        .color-picker-container {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        input[type="color"] {
-            width: 60px;
-            height: 40px;
-            border: 1px solid var(--cell-border);
-            border-radius: 8px;
-            background: none;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        input[type="color"]:hover {
-            border-color: var(--container-border);
-            transform: scale(1.05);
-        }
-
-        .color-label {
-            color: var(--text-secondary);
-            font-family: 'SF Mono', Monaco, monospace;
-            font-size: 14px;
-            background: var(--cell-bg);
-            padding: 8px 12px;
-            border-radius: 6px;
-            border: 1px solid var(--cell-border);
-            min-width: 80px;
-            text-align: center;
-        }
-
-        .settings-actions {
-            display: flex;
-            gap: 12px;
-            margin-top: 32px;
-        }
-
-        .settings-actions button {
-            flex: 1;
-            padding: 12px 16px;
-            font-size: 14px;
-        }
-
-        #resetColors {
-            background: var(--cell-bg);
-            border-color: var(--cell-border);
             color: var(--text-secondary);
         }
 
-        #resetColors:hover {
-            background: var(--cell-hover-bg);
-            color: var(--text-primary);
+        .btn-icon:hover { color: var(--text); }
+
+        .btn-today {
+            background: var(--accent-soft);
+            border-color: transparent;
+            color: var(--accent);
+            font-weight: 600;
+            font-size: 13px;
+            letter-spacing: 0.02em;
         }
 
-        #saveSettings {
-            background: rgba(0, 122, 255, 0.2);
-            border-color: rgba(0, 122, 255, 0.3);
-            color: var(--text-primary);
+        .btn-today:hover {
+            background: var(--accent-hover);
+            border-color: transparent;
         }
 
-        #saveSettings:hover {
-            background: rgba(0, 122, 255, 0.3);
-            border-color: rgba(0, 122, 255, 0.4);
+        .btn-ghost {
+            background: transparent;
+            border-color: transparent;
+        }
+
+        .btn-ghost:hover {
+            background: var(--surface-hover);
+            border-color: transparent;
+        }
+
+        .separator {
+            width: 1px;
+            height: 20px;
+            background: var(--border);
+            margin: 0 4px;
+        }
+
+        @media (max-width: 640px) {
+            .controls {
+                justify-content: center;
+                gap: 8px;
+            }
+            .month-year-display {
+                order: -1;
+                flex-basis: 100%;
+                margin-bottom: 4px;
+            }
+        }
+
+        /* ── Calendar Grid ──────────────────── */
+
+        .calendar-frame {
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
         }
 
         .calendar {
-            border-collapse: separate;
-            border-spacing: 4px;
             width: 100%;
-            margin-top: 24px;
-            background: var(--controls-bg);
-            border-radius: 20px;
-            padding: 8px;
-            backdrop-filter: blur(10px);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .calendar th,
-        .calendar td {
-            text-align: center;
-            padding: 12px 6px;
-            width: 14.28%;
-            border-radius: 12px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border-collapse: collapse;
+            table-layout: fixed;
         }
 
         .calendar th {
-            background: var(--cell-bg);
-            backdrop-filter: blur(10px);
-            color: var(--text-primary);
+            font-family: var(--font-body);
+            font-size: 13px;
             font-weight: 600;
-            font-size: 20px;
-            letter-spacing: 0.5px;
-            border: 1px solid var(--cell-border);
             text-transform: uppercase;
-            padding: 16px 6px;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+            padding: 12px 10px;
+            text-align: left;
+            border-bottom: 2px solid var(--border);
+            background: var(--surface);
         }
 
         .calendar td {
             height: 120px;
             vertical-align: top;
-            padding: 12px;
-            background: var(--cell-bg);
-            backdrop-filter: blur(8px);
-            border: 1px solid var(--cell-border);
+            padding: 8px 10px;
+            background: var(--surface);
+            border: 1px solid var(--border-subtle);
             position: relative;
-            overflow: hidden;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: background 0.15s ease;
+            cursor: default;
         }
 
         @media (max-width: 768px) {
             .calendar td {
-                height: 80px;
+                height: 76px;
                 padding: 6px;
             }
-
             .calendar th {
-                padding: 12px 6px;
-                font-size: 16px;
+                padding: 8px 6px;
             }
         }
 
         @media (max-width: 480px) {
             .calendar td {
-                height: 70px;
+                height: 64px;
                 padding: 4px;
             }
-
             .calendar th {
-                padding: 8px 4px;
-                font-size: 14px;
+                padding: 6px 4px;
+                font-size: 10px;
             }
-        }
-
-        .calendar td::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, var(--container-highlight), transparent);
-            opacity: 0;
-            transition: opacity 0.3s ease;
         }
 
         .calendar td:hover {
-            background: var(--cell-hover-bg);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-            border-color: var(--container-border);
-        }
-
-        .calendar td:hover::before {
-            opacity: 1;
+            background: var(--surface-hover);
         }
 
         .day-content {
             display: flex;
             flex-direction: column;
-            align-items: center;
-            justify-content: center;
             height: 100%;
-            position: relative;
         }
 
         .gregorian-date {
+            font-family: var(--font-display);
             font-size: 36px;
             font-weight: 600;
-            margin-bottom: 8px;
-            color: var(--text-primary);
+            color: var(--text);
+            line-height: 1;
+            margin-bottom: 6px;
         }
 
         .lunar-date {
-            font-size: 22px;
+            font-size: 16px;
             color: var(--text-secondary);
             line-height: 1;
             white-space: nowrap;
@@ -588,13 +372,10 @@
 
         @media (max-width: 768px) {
             .gregorian-date {
-                font-size: 24px;
-                margin-bottom: 4px;
+                font-size: 26px;
+                margin-bottom: 3px;
             }
-
-            .lunar-date {
-                font-size: 16px;
-            }
+            .lunar-date { font-size: 14px; }
         }
 
         @media (max-width: 480px) {
@@ -602,14 +383,13 @@
                 font-size: 20px;
                 margin-bottom: 2px;
             }
-
-            .lunar-date {
-                font-size: 14px;
-            }
+            .lunar-date { font-size: 12px; }
         }
 
+        /* ── States ─────────────────────────── */
+
         .calendar td.other-month {
-            opacity: 0.4;
+            background: var(--bg-subtle);
         }
 
         .calendar td.other-month .gregorian-date {
@@ -618,120 +398,284 @@
 
         .calendar td.other-month .lunar-date {
             color: var(--text-muted);
+            opacity: 0.6;
         }
 
         .calendar td.today {
-            background: var(--today-bg) !important;
-            border-color: var(--today-border) !important;
-            backdrop-filter: blur(12px);
-            box-shadow: 0 4px 20px var(--today-shadow);
+            background: var(--today-bg);
         }
 
         .calendar td.today .gregorian-date {
-            font-weight: 700;
-            color: var(--text-primary);
+            color: var(--accent);
+            font-weight: 500;
         }
 
         .calendar td.sunday .gregorian-date {
-            color: var(--sunday-color);
+            color: var(--sunday);
         }
 
         .calendar td.sunday .lunar-date {
-            color: var(--sunday-secondary);
+            color: var(--sunday-soft);
         }
 
-        h1 {
-            text-align: center;
-            color: var(--text-primary);
-            margin-bottom: 32px;
-            font-size: 32px;
-            font-weight: 700;
-            letter-spacing: -0.5px;
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        .calendar th.sunday-header {
+            color: var(--sunday);
         }
 
-        @media (max-width: 768px) {
-            h1 {
-                font-size: 28px;
-                margin-bottom: 20px;
-            }
+        /* ── Settings Panel ─────────────────── */
+
+        .settings-panel {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .settings-panel.show {
+            display: flex;
+            opacity: 1;
+        }
+
+        .settings-content {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 0;
+            box-shadow: var(--shadow-lg);
+            max-width: 380px;
+            width: 90%;
+            transform: translateY(0);
+            transition: transform 0.2s ease;
         }
 
         @media (max-width: 480px) {
-            h1 {
-                font-size: 24px;
-                margin-bottom: 16px;
+            .settings-content {
+                width: 95%;
+                margin: 20px;
             }
         }
 
-        .month-year-display {
-            text-align: center;
-            font-size: 28px;
-            font-weight: 600;
-            margin: 24px 0;
-            color: var(--text-primary);
-            letter-spacing: -0.3px;
-            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        .settings-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 24px 16px;
+            border-bottom: 1px solid var(--border-subtle);
         }
+
+        .settings-header h3 {
+            font-family: var(--font-display);
+            font-size: 20px;
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        #closeSettings {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: var(--text-muted);
+            padding: 4px 8px;
+            border-radius: var(--radius);
+            min-height: auto;
+        }
+
+        #closeSettings:hover {
+            background: var(--surface-hover);
+            color: var(--text);
+            transform: none;
+        }
+
+        .settings-body { padding: 20px 24px 24px; }
+
+        .setting-group { margin-bottom: 20px; }
+        .setting-group:last-of-type { margin-bottom: 0; }
+
+        .setting-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text);
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .color-picker-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        input[type="color"] {
+            width: 48px;
+            height: 32px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: none;
+            cursor: pointer;
+            transition: border-color 0.2s ease;
+        }
+
+        input[type="color"]:hover { border-color: var(--text-muted); }
+
+        .color-label {
+            color: var(--text-secondary);
+            font-family: 'SF Mono', 'Fira Code', monospace;
+            font-size: 13px;
+            background: var(--bg-subtle);
+            padding: 6px 10px;
+            border-radius: 6px;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .settings-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 24px;
+        }
+
+        .settings-actions button {
+            flex: 1;
+            padding: 10px 14px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        #resetColors {
+            background: var(--bg-subtle);
+            border-color: var(--border);
+            color: var(--text-secondary);
+        }
+
+        #resetColors:hover {
+            background: var(--surface-hover);
+            color: var(--text);
+        }
+
+        #saveSettings {
+            background: var(--accent-soft);
+            border-color: transparent;
+            color: var(--accent);
+        }
+
+        #saveSettings:hover {
+            background: var(--accent-hover);
+        }
+
+        /* ── Footer ─────────────────────────── */
+
+        footer {
+            text-align: center;
+            padding: 24px 0 32px;
+            color: var(--text-muted);
+            font-size: 12px;
+            letter-spacing: 0.01em;
+        }
+
+        /* ── Page load animation ────────────── */
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header { animation: fadeUp 0.4s ease both; }
+        .controls { animation: fadeUp 0.4s ease 0.05s both; }
+        .calendar-frame { animation: fadeUp 0.4s ease 0.1s both; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>LunarCal</h1>
+        <div class="header">
+            <h1>LunarCal</h1>
+            <div class="header-actions">
+                <button id="todayButton" class="btn-today">Today</button>
+                <div class="separator"></div>
+                <button id="themeToggle" class="btn-icon btn-ghost" aria-label="Toggle theme">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+                        <path d="M8 1v1m0 12v1m7-7h-1M2 8H1m12.07-4.07-.71.71M3.64 12.36l-.71.71m10.14 0-.71-.71M3.64 3.64l-.71-.71"/>
+                        <circle cx="8" cy="8" r="3"/>
+                    </svg>
+                </button>
+                <button id="settingsButton" class="btn-icon btn-ghost" aria-label="Settings">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+                        <circle cx="8" cy="8" r="2.5"/>
+                        <path d="M8 1v2m0 10v2M1 8h2m10 0h2M2.93 2.93l1.41 1.41m7.32 7.32 1.41 1.41m0-11.74-1.41 1.41M4.34 11.66l-1.41 1.41"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
 
         <div class="controls">
-            <label for="monthSelect">Month:</label>
-            <button id="prevMonthButton">←</button>
-            <select id="monthSelect">
-                <option value="0">January</option>
-                <option value="1">February</option>
-                <option value="2">March</option>
-                <option value="3">April</option>
-                <option value="4">May</option>
-                <option value="5">June</option>
-                <option value="6">July</option>
-                <option value="7">August</option>
-                <option value="8">September</option>
-                <option value="9">October</option>
-                <option value="10">November</option>
-                <option value="11">December</option>
-            </select>
-            <button id="nextMonthButton">→</button>
+            <div class="controls-group">
+                <button id="prevYearButton" class="btn-icon" aria-label="Previous year">
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M8 3L4 7l4 4"/><path d="M12 3L8 7l4 4"/></svg>
+                </button>
+                <button id="prevMonthButton" class="btn-icon" aria-label="Previous month">
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M9 3L5 7l4 4"/></svg>
+                </button>
+            </div>
 
-            <label for="yearSelect">Year:</label>
-            <button id="prevYearButton">←</button>
-            <select id="yearSelect">
-                <!-- Years will be populated by JavaScript -->
-            </select>
-            <button id="nextYearButton">→</button>
+            <div class="month-year-display" id="monthYearDisplay"></div>
 
-            <button id="todayButton">Go to Today</button>
+            <div class="controls-group">
+                <button id="nextMonthButton" class="btn-icon" aria-label="Next month">
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M5 3l4 4-4 4"/></svg>
+                </button>
+                <button id="nextYearButton" class="btn-icon" aria-label="Next year">
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M6 3l4 4-4 4"/><path d="M2 3l4 4-4 4"/></svg>
+                </button>
+            </div>
 
-            <button id="themeToggle">🌙</button>
-
-            <button id="settingsButton">⚙️</button>
+            <div class="controls-group" style="margin-left: auto;">
+                <select id="monthSelect">
+                    <option value="0">January</option>
+                    <option value="1">February</option>
+                    <option value="2">March</option>
+                    <option value="3">April</option>
+                    <option value="4">May</option>
+                    <option value="5">June</option>
+                    <option value="6">July</option>
+                    <option value="7">August</option>
+                    <option value="8">September</option>
+                    <option value="9">October</option>
+                    <option value="10">November</option>
+                    <option value="11">December</option>
+                </select>
+                <select id="yearSelect"></select>
+            </div>
         </div>
 
-        <div class="month-year-display" id="monthYearDisplay">
-            <!-- Current month and year will be displayed here -->
+        <div class="calendar-frame">
+            <table class="calendar" id="calendar">
+                <thead>
+                    <tr>
+                        <th class="sunday-header">Sun</th>
+                        <th>Mon</th>
+                        <th>Tue</th>
+                        <th>Wed</th>
+                        <th>Thu</th>
+                        <th>Fri</th>
+                        <th>Sat</th>
+                    </tr>
+                </thead>
+                <tbody id="calendarBody"></tbody>
+            </table>
         </div>
-
-        <table class="calendar" id="calendar">
-            <thead>
-                <tr>
-                    <th>Sun</th>
-                    <th>Mon</th>
-                    <th>Tue</th>
-                    <th>Wed</th>
-                    <th>Thu</th>
-                    <th>Fri</th>
-                    <th>Sat</th>
-                </tr>
-            </thead>
-            <tbody id="calendarBody">
-                <!-- Calendar days will be generated here -->
-            </tbody>
-        </table>
     </div>
 
     <!-- Settings Panel -->
@@ -739,26 +683,26 @@
         <div class="settings-content">
             <div class="settings-header">
                 <h3>Settings</h3>
-                <button id="closeSettings">×</button>
+                <button id="closeSettings">&times;</button>
             </div>
             <div class="settings-body">
                 <div class="setting-group">
-                    <label for="darkBgColor">Dark Mode Background:</label>
+                    <label for="darkBgColor">Dark Mode Background</label>
                     <div class="color-picker-container">
-                        <input type="color" id="darkBgColor" value="#1e3a8a">
-                        <span class="color-label" id="darkBgLabel">#1e3a8a</span>
+                        <input type="color" id="darkBgColor" value="#111110">
+                        <span class="color-label" id="darkBgLabel">#111110</span>
                     </div>
                 </div>
                 <div class="setting-group">
-                    <label for="lightBgColor">Light Mode Background:</label>
+                    <label for="lightBgColor">Light Mode Background</label>
                     <div class="color-picker-container">
-                        <input type="color" id="lightBgColor" value="#dbeafe">
-                        <span class="color-label" id="lightBgLabel">#dbeafe</span>
+                        <input type="color" id="lightBgColor" value="#f5f0e8">
+                        <span class="color-label" id="lightBgLabel">#f5f0e8</span>
                     </div>
                 </div>
                 <div class="settings-actions">
-                    <button id="resetColors">Reset to Default</button>
-                    <button id="saveSettings">Save Settings</button>
+                    <button id="resetColors">Reset</button>
+                    <button id="saveSettings">Save</button>
                 </div>
             </div>
         </div>
@@ -775,7 +719,6 @@
         const monthYearDisplay = document.getElementById('monthYearDisplay');
         const calendarBody = document.getElementById('calendarBody');
 
-        // Chinese lunar calendar data and functions
         const lunarMonthNames = [
             '正月', '二月', '三月', '四月', '五月', '六月',
             '七月', '八月', '九月', '十月', '冬月', '腊月'
@@ -787,13 +730,10 @@
             '廿一', '廿二', '廿三', '廿四', '廿五', '廿六', '廿七', '廿八', '廿九', '三十'
         ];
 
-        // Accurate Chinese lunar calendar conversion using lunar-javascript library
         function solarToLunar(solarDate) {
             try {
-                // Use the lunar-javascript library for accurate conversion
                 const solar = Solar.fromDate(solarDate);
                 const lunar = solar.getLunar();
-
                 return {
                     year: lunar.getYear(),
                     month: lunar.getMonth(),
@@ -802,7 +742,6 @@
                     dayName: lunar.getDayInChinese()
                 };
             } catch (error) {
-                // Fallback in case library fails
                 console.error('Lunar conversion error:', error);
                 return {
                     year: solarDate.getFullYear(),
@@ -815,26 +754,20 @@
         }
 
         function formatLunarDate(lunarDate) {
-            // For the first day of the month, show the full month name
             if (lunarDate.day === 1) {
                 if (lunarDate.monthName) {
-                    // Ensure the month name includes "月" suffix
                     let monthName = lunarDate.monthName;
                     if (!monthName.endsWith('月') && monthName !== '正月' && monthName !== '冬月' && monthName !== '腊月') {
                         monthName = monthName + '月';
                     }
                     return monthName;
                 } else {
-                    // Fallback to our custom arrays
                     return lunarMonthNames[lunarDate.month - 1] || '正月';
                 }
             }
-
-            // For other days, show the day name
             if (lunarDate.dayName) {
                 return lunarDate.dayName;
             } else {
-                // Fallback to our custom arrays
                 return lunarDayNames[lunarDate.day - 1] || '初一';
             }
         }
@@ -851,7 +784,6 @@
 
         function generateCalendar(month, year) {
             const firstDay = new Date(year, month, 1);
-            const lastDay = new Date(year, month + 1, 0);
             const startDate = new Date(firstDay);
             startDate.setDate(startDate.getDate() - firstDay.getDay());
 
@@ -872,17 +804,14 @@
                     const cell = document.createElement('td');
                     const dayNumber = currentDate.getDate();
 
-                    // Create day content container
                     const dayContent = document.createElement('div');
                     dayContent.className = 'day-content';
 
-                    // Gregorian date
                     const gregorianDiv = document.createElement('div');
                     gregorianDiv.className = 'gregorian-date';
                     gregorianDiv.textContent = dayNumber;
                     dayContent.appendChild(gregorianDiv);
 
-                    // Lunar date
                     const lunarDate = solarToLunar(new Date(currentDate));
                     const lunarDiv = document.createElement('div');
                     lunarDiv.className = 'lunar-date';
@@ -891,7 +820,6 @@
 
                     cell.appendChild(dayContent);
 
-                    // Check if it's Sunday (day 0 is Sunday)
                     if (currentDate.getDay() === 0) {
                         cell.classList.add('sunday');
                     }
@@ -932,13 +860,8 @@
         function goToPreviousMonth() {
             let currentMonth = parseInt(monthSelect.value);
             let currentYear = parseInt(yearSelect.value);
-
             currentMonth--;
-            if (currentMonth < 0) {
-                currentMonth = 11;
-                currentYear--;
-            }
-
+            if (currentMonth < 0) { currentMonth = 11; currentYear--; }
             monthSelect.value = currentMonth;
             yearSelect.value = currentYear;
             generateCalendar(currentMonth, currentYear);
@@ -947,13 +870,8 @@
         function goToNextMonth() {
             let currentMonth = parseInt(monthSelect.value);
             let currentYear = parseInt(yearSelect.value);
-
             currentMonth++;
-            if (currentMonth > 11) {
-                currentMonth = 0;
-                currentYear++;
-            }
-
+            if (currentMonth > 11) { currentMonth = 0; currentYear++; }
             monthSelect.value = currentMonth;
             yearSelect.value = currentYear;
             generateCalendar(currentMonth, currentYear);
@@ -962,9 +880,7 @@
         function goToPreviousYear() {
             let currentMonth = parseInt(monthSelect.value);
             let currentYear = parseInt(yearSelect.value);
-
             currentYear--;
-            monthSelect.value = currentMonth;
             yearSelect.value = currentYear;
             generateCalendar(currentMonth, currentYear);
         }
@@ -972,41 +888,68 @@
         function goToNextYear() {
             let currentMonth = parseInt(monthSelect.value);
             let currentYear = parseInt(yearSelect.value);
-
             currentYear++;
-            monthSelect.value = currentMonth;
             yearSelect.value = currentYear;
             generateCalendar(currentMonth, currentYear);
         }
 
-        function initialize() {
-            initializeTheme();
-            initializeColors();
-            populateYears();
+        // ── Theme ──────────────────────────────
 
-            const now = new Date();
-            monthSelect.value = now.getMonth();
-            yearSelect.value = now.getFullYear();
-
-            generateCalendar(now.getMonth(), now.getFullYear());
-
-            monthSelect.addEventListener('change', updateCalendar);
-            yearSelect.addEventListener('change', updateCalendar);
-            document.getElementById('todayButton').addEventListener('click', goToToday);
-            document.getElementById('prevMonthButton').addEventListener('click', goToPreviousMonth);
-            document.getElementById('nextMonthButton').addEventListener('click', goToNextMonth);
-            document.getElementById('prevYearButton').addEventListener('click', goToPreviousYear);
-            document.getElementById('nextYearButton').addEventListener('click', goToNextYear);
-            document.getElementById('themeToggle').addEventListener('click', toggleTheme);
-            document.getElementById('settingsButton').addEventListener('click', openSettings);
-            document.getElementById('closeSettings').addEventListener('click', closeSettings);
-            document.getElementById('saveSettings').addEventListener('click', saveSettings);
-            document.getElementById('resetColors').addEventListener('click', resetColors);
-            document.getElementById('darkBgColor').addEventListener('input', updateColorLabel);
-            document.getElementById('lightBgColor').addEventListener('input', updateColorLabel);
+        function updateThemeIcon() {
+            const themeToggle = document.getElementById('themeToggle');
+            const isDark = document.body.dataset.theme !== 'light';
+            themeToggle.innerHTML = isDark
+                ? '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M8 1v1m0 12v1m7-7h-1M2 8H1m12.07-4.07-.71.71M3.64 12.36l-.71.71m10.14 0-.71-.71M3.64 3.64l-.71-.71"/><circle cx="8" cy="8" r="3"/></svg>'
+                : '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M14 9.5A6.5 6.5 0 016.5 2 5.5 5.5 0 1014 9.5z"/></svg>';
         }
 
-        // Settings functionality
+        function toggleTheme() {
+            const body = document.body;
+            const root = document.documentElement;
+
+            if (body.dataset.theme === 'light') {
+                body.dataset.theme = 'dark';
+                localStorage.setItem('theme', 'dark');
+                const savedDarkColor = localStorage.getItem('darkBgColor') || '#111110';
+                const darkGradientEnd = adjustBrightness(savedDarkColor, 8);
+                root.style.setProperty('--bg-gradient-start', savedDarkColor);
+                root.style.setProperty('--bg-gradient-end', darkGradientEnd);
+            } else {
+                body.dataset.theme = 'light';
+                localStorage.setItem('theme', 'light');
+                const savedLightColor = localStorage.getItem('lightBgColor') || '#f5f0e8';
+                const lightGradientEnd = adjustBrightness(savedLightColor, -5);
+                root.style.setProperty('--bg-gradient-start', savedLightColor);
+                root.style.setProperty('--bg-gradient-end', lightGradientEnd);
+            }
+
+            updateThemeIcon();
+        }
+
+        function initializeTheme() {
+            const body = document.body;
+            const savedTheme = localStorage.getItem('theme');
+            const root = document.documentElement;
+
+            if (savedTheme === 'light') {
+                body.dataset.theme = 'light';
+                const savedLightColor = localStorage.getItem('lightBgColor') || '#f5f0e8';
+                const lightGradientEnd = adjustBrightness(savedLightColor, -5);
+                root.style.setProperty('--bg-gradient-start', savedLightColor);
+                root.style.setProperty('--bg-gradient-end', lightGradientEnd);
+            } else {
+                body.dataset.theme = 'dark';
+                const savedDarkColor = localStorage.getItem('darkBgColor') || '#111110';
+                const darkGradientEnd = adjustBrightness(savedDarkColor, 8);
+                root.style.setProperty('--bg-gradient-start', savedDarkColor);
+                root.style.setProperty('--bg-gradient-end', darkGradientEnd);
+            }
+
+            updateThemeIcon();
+        }
+
+        // ── Settings ───────────────────────────
+
         function openSettings() {
             document.getElementById('settingsPanel').classList.add('show');
             loadCurrentColors();
@@ -1017,9 +960,8 @@
         }
 
         function loadCurrentColors() {
-            const darkColor = localStorage.getItem('darkBgColor') || '#1e3a8a';
-            const lightColor = localStorage.getItem('lightBgColor') || '#dbeafe';
-
+            const darkColor = localStorage.getItem('darkBgColor') || '#111110';
+            const lightColor = localStorage.getItem('lightBgColor') || '#f5f0e8';
             document.getElementById('darkBgColor').value = darkColor;
             document.getElementById('lightBgColor').value = lightColor;
             document.getElementById('darkBgLabel').textContent = darkColor;
@@ -1035,43 +977,29 @@
         function saveSettings() {
             const darkColor = document.getElementById('darkBgColor').value;
             const lightColor = document.getElementById('lightBgColor').value;
-
             localStorage.setItem('darkBgColor', darkColor);
             localStorage.setItem('lightBgColor', lightColor);
-
             updateBackgroundColors(darkColor, lightColor);
             closeSettings();
         }
 
         function resetColors() {
-            const defaultDark = '#1e3a8a';
-            const defaultLight = '#dbeafe';
-
+            const defaultDark = '#111110';
+            const defaultLight = '#f5f0e8';
             document.getElementById('darkBgColor').value = defaultDark;
             document.getElementById('lightBgColor').value = defaultLight;
             document.getElementById('darkBgLabel').textContent = defaultDark;
             document.getElementById('lightBgLabel').textContent = defaultLight;
-
             localStorage.removeItem('darkBgColor');
             localStorage.removeItem('lightBgColor');
-
             updateBackgroundColors(defaultDark, defaultLight);
         }
 
         function updateBackgroundColors(darkColor, lightColor) {
             const root = document.documentElement;
+            const darkGradientEnd = adjustBrightness(darkColor, 8);
+            const lightGradientEnd = adjustBrightness(lightColor, -5);
 
-            // Create gradients from the selected colors
-            const darkGradientEnd = adjustBrightness(darkColor, 20);
-            const lightGradientEnd = adjustBrightness(lightColor, -10);
-
-            // Store the custom colors
-            root.style.setProperty('--custom-dark-start', darkColor);
-            root.style.setProperty('--custom-dark-end', darkGradientEnd);
-            root.style.setProperty('--custom-light-start', lightColor);
-            root.style.setProperty('--custom-light-end', lightGradientEnd);
-
-            // Apply colors based on current theme
             const currentTheme = document.body.dataset.theme;
             if (currentTheme === 'light') {
                 root.style.setProperty('--bg-gradient-start', lightColor);
@@ -1097,105 +1025,55 @@
         function initializeColors() {
             const savedDarkColor = localStorage.getItem('darkBgColor');
             const savedLightColor = localStorage.getItem('lightBgColor');
-
             if (savedDarkColor || savedLightColor) {
                 updateBackgroundColors(
-                    savedDarkColor || '#1e3a8a',
-                    savedLightColor || '#dbeafe'
+                    savedDarkColor || '#111110',
+                    savedLightColor || '#f5f0e8'
                 );
             }
         }
 
-        // Close settings when clicking outside
         document.addEventListener('click', function(event) {
             const settingsPanel = document.getElementById('settingsPanel');
             const settingsContent = document.querySelector('.settings-content');
             const settingsButton = document.getElementById('settingsButton');
-
             if (settingsPanel.classList.contains('show') &&
                 !settingsContent.contains(event.target) &&
-                event.target !== settingsButton) {
+                event.target !== settingsButton &&
+                !settingsButton.contains(event.target)) {
                 closeSettings();
             }
         });
 
-        // Update theme toggle to also update colors
-        function toggleTheme() {
-            const body = document.body;
-            const themeToggle = document.getElementById('themeToggle');
-            const root = document.documentElement;
+        // ── Initialize ─────────────────────────
 
-            if (body.dataset.theme === 'light') {
-                body.dataset.theme = 'dark';
-                themeToggle.textContent = '🌙';
-                localStorage.setItem('theme', 'dark');
+        function initialize() {
+            initializeTheme();
+            initializeColors();
+            populateYears();
 
-                // Apply dark theme colors
-                const savedDarkColor = localStorage.getItem('darkBgColor') || '#1e3a8a';
-                const darkGradientEnd = adjustBrightness(savedDarkColor, 20);
-                root.style.setProperty('--bg-gradient-start', savedDarkColor);
-                root.style.setProperty('--bg-gradient-end', darkGradientEnd);
-            } else {
-                body.dataset.theme = 'light';
-                themeToggle.textContent = '☀️';
-                localStorage.setItem('theme', 'light');
+            const now = new Date();
+            monthSelect.value = now.getMonth();
+            yearSelect.value = now.getFullYear();
+            generateCalendar(now.getMonth(), now.getFullYear());
 
-                // Apply light theme colors
-                const savedLightColor = localStorage.getItem('lightBgColor') || '#dbeafe';
-                const lightGradientEnd = adjustBrightness(savedLightColor, -10);
-                root.style.setProperty('--bg-gradient-start', savedLightColor);
-                root.style.setProperty('--bg-gradient-end', lightGradientEnd);
-            }
-
-            // Force refresh calendar styling after theme switch
-            setTimeout(() => {
-                refreshCalendarStyling();
-            }, 50);
-        }
-
-        function refreshCalendarStyling() {
-            // Force browser to recalculate styles by triggering a reflow
-            const calendar = document.getElementById('calendar');
-            if (calendar) {
-                calendar.style.display = 'none';
-                calendar.offsetHeight; // Trigger reflow
-                calendar.style.display = '';
-            }
-        }
-
-
-        function initializeTheme() {
-            const body = document.body;
-            const themeToggle = document.getElementById('themeToggle');
-            const savedTheme = localStorage.getItem('theme');
-            const root = document.documentElement;
-
-            if (savedTheme === 'light') {
-                body.dataset.theme = 'light';
-                themeToggle.textContent = '☀️';
-
-                // Apply saved light theme colors
-                const savedLightColor = localStorage.getItem('lightBgColor') || '#dbeafe';
-                const lightGradientEnd = adjustBrightness(savedLightColor, -10);
-                root.style.setProperty('--bg-gradient-start', savedLightColor);
-                root.style.setProperty('--bg-gradient-end', lightGradientEnd);
-            } else {
-                body.dataset.theme = 'dark';
-                themeToggle.textContent = '🌙';
-
-                // Apply saved dark theme colors
-                const savedDarkColor = localStorage.getItem('darkBgColor') || '#1e3a8a';
-                const darkGradientEnd = adjustBrightness(savedDarkColor, 20);
-                root.style.setProperty('--bg-gradient-start', savedDarkColor);
-                root.style.setProperty('--bg-gradient-end', darkGradientEnd);
-            }
+            monthSelect.addEventListener('change', updateCalendar);
+            yearSelect.addEventListener('change', updateCalendar);
+            document.getElementById('todayButton').addEventListener('click', goToToday);
+            document.getElementById('prevMonthButton').addEventListener('click', goToPreviousMonth);
+            document.getElementById('nextMonthButton').addEventListener('click', goToNextMonth);
+            document.getElementById('prevYearButton').addEventListener('click', goToPreviousYear);
+            document.getElementById('nextYearButton').addEventListener('click', goToNextYear);
+            document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+            document.getElementById('settingsButton').addEventListener('click', openSettings);
+            document.getElementById('closeSettings').addEventListener('click', closeSettings);
+            document.getElementById('saveSettings').addEventListener('click', saveSettings);
+            document.getElementById('resetColors').addEventListener('click', resetColors);
+            document.getElementById('darkBgColor').addEventListener('input', updateColorLabel);
+            document.getElementById('lightBgColor').addEventListener('input', updateColorLabel);
         }
 
         initialize();
     </script>
-
-    <footer style="text-align: center; margin-top: 20px; color: var(--text-muted); font-size: 12px;">
-        Copyright &copy; 2025 Tat Chu
-    </footer>
 </body>
 </html>
